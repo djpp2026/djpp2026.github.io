@@ -1,0 +1,24 @@
+{
+  "site_name": "",
+  "site_url": "",
+  "categories": [
+    "indonesia",
+    "papua",
+    "barat"
+  ],
+  "timezone": "Asia/Jayapura",
+  "legacy_site_url": "",
+  "github": {
+    "owner": "",
+    "repository": "",
+    "branch": "main"
+  },
+  "ads": {
+    "enabled": false,
+    "popunder": "",
+    "social_bar": "",
+    "banner_desktop": "",
+    "banner_mobile": "",
+    "native": ""
+  }
+}
