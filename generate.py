@@ -53,16 +53,14 @@ def cover(v,detail=False):
     local=os.path.join(BASE,c.lstrip("/"))
     if os.path.exists(local):return ("../" if detail else "")+c.lstrip("/")
     return LEGACY+"/"+c.lstrip("/")
-def og(v,detail=False):
-    c=str(v.get("ogCover") or "").strip()
+def og(v):
+    c=str(v.get("cover") or "").strip() or DEFAULT
     if c.startswith(("http://","https://")):return c
-    if not c:c=f'covers/og/{v["slug"]}.jpg'
-    local=os.path.join(BASE,c.lstrip("/"))
+    c=c.lstrip("/")
+    local=os.path.join(BASE,c)
     if os.path.exists(local):
-        if detail:return "../"+c.lstrip("/")
-        if SITE_URL:return SITE_URL+"/"+c.lstrip("/")
-        return c.lstrip("/")
-    return (LEGACY+"/"+c.lstrip("/")) if LEGACY else c.lstrip("/")
+        return (SITE_URL+"/"+c) if SITE_URL else c
+    return (LEGACY+"/"+c) if LEGACY else c
 def card(v):
     return f'<a href="videos/{esc(v["slug"])}.html" class="video-card" data-category="{esc(v["kategori"])}"><img src="{esc(cover(v))}" alt="{esc(v["judul"])}" loading="lazy"><div class="card-body"><h3>{esc(v["judul"])}</h3><p class="meta-date">{esc(dtext(v))}</p><span class="badge">{esc(v["kategori"])}</span></div></a>'
 def rel(v):
@@ -76,7 +74,7 @@ def main():
         if f.endswith(".html"):os.remove(os.path.join(OUT,f))
     vt=open(os.path.join(TEMPLATES,"video.html"),encoding="utf-8").read()
     for v in vs:
-        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v["driveId"])).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(og(v,True) if v.get("ogCover") else cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
+        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v["driveId"])).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
         out=out.replace("{{ RELATED_VIDEOS }}","\n".join(rel(x) for x in ordered if x["slug"]!=v["slug"]) or '<p>Belum ada video lainnya.</p>')
         open(os.path.join(OUT,v["slug"]+".html"),"w",encoding="utf-8").write(out)
     print("Generated",len(vs),"videos")
