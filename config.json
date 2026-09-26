@@ -1,6 +1,6 @@
 {
-  "site_name": "",
-  "site_url": "",
+  "site_name": "DJ PP 2026",
+  "site_url": "https://djpp2026.github.io",
   "categories": [
     "indonesia",
     "papua",
@@ -9,8 +9,8 @@
   "timezone": "Asia/Jayapura",
   "legacy_site_url": "",
   "github": {
-    "owner": "",
-    "repository": "",
+    "owner": "djpp2026",
+    "repository": "djpp2026.github.io",
     "branch": "main"
   },
   "ads": {
