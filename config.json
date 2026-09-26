@@ -14,11 +14,11 @@
     "branch": "main"
   },
   "ads": {
-    "enabled": false,
-    "popunder": "",
-    "social_bar": "",
-    "banner_desktop": "",
-    "banner_mobile": "",
-    "native": ""
+    "enabled": true,
+    "popunder": "<script src=\"https://pl31522108.profitableratecpmnetwork.com/81/12/46/81124627bb8935fb10c5af389b6fd7ea.js\"></script>",
+    "social_bar": "<script src=\"https://pl31522109.profitableratecpmnetwork.com/a5/12/85/a512850cfbeeae7e295dcfb4c69eb243.js\"></script>",
+    "banner_desktop": "<script>\n  atOptions = {\n    'key' : '77ea0eeaf33eb5e6f7739268d21ae05c',\n    'format' : 'iframe',\n    'height' : 250,\n    'width' : 300,\n    'params' : {}\n  };\n</script>\n<script src=\"https://www.highrevenueformat.com/77ea0eeaf33eb5e6f7739268d21ae05c/invoke.js\"></script>",
+    "banner_mobile": "<script>\n  atOptions = {\n    'key' : 'b7e3f29abab0cf0fbd181b612c67aece',\n    'format' : 'iframe',\n    'height' : 50,\n    'width' : 320,\n    'params' : {}\n  };\n</script>\n<script src=\"https://www.highrevenueformat.com/b7e3f29abab0cf0fbd181b612c67aece/invoke.js\"></script>",
+    "native": "<script async=\"async\" data-cfasync=\"false\" src=\"https://pl31522107.profitableratecpmnetwork.com/3644590e09de1f648fd7627a4253f5a3/invoke.js\"></script>\n<div id=\"container-3644590e09de1f648fd7627a4253f5a3\"></div>"
   }
 }
