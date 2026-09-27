@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import html,json,os
+import html,json,os,re
 from datetime import datetime
 BASE=os.path.dirname(os.path.abspath(__file__)); DATA=os.path.join(BASE,"videos.json"); TEMPLATES=os.path.join(BASE,"templates"); OUT=os.path.join(BASE,"videos")
 CONFIG=os.path.join(BASE,"config.json")
@@ -31,6 +31,18 @@ AD_ENABLED=bool(ADS.get("enabled",False))
 def ad(name):
     if not AD_ENABLED:return ""
     return str(ADS.get(name,"") or "").strip()
+
+def native_ad(slot_id):
+    raw=ad("native")
+    if not raw:return ""
+    # Keep the native slot position fixed in the template. Only make the
+    # provider container unique per slot, regardless of which native code
+    # the admin enters later.
+    ids=re.findall(r'container-([A-Za-z0-9_-]+)', raw)
+    if ids:
+        base=ids[0]
+        raw=raw.replace("container-"+base, f"container-{base}-{slot_id}")
+    return raw
 def load():
     with open(DATA,encoding="utf-8") as f:v=json.load(f)
     if not isinstance(v,list): raise ValueError("videos.json harus array")
@@ -74,8 +86,15 @@ def main():
         if f.endswith(".html"):os.remove(os.path.join(OUT,f))
     vt=open(os.path.join(TEMPLATES,"video.html"),encoding="utf-8").read()
     for v in vs:
-        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v["driveId"])).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html')).replace("{{ AD_POPUNDER }}",ad("popunder")).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile")).replace("{{ AD_NATIVE }}",ad("native"))
-        out=out.replace("{{ RELATED_VIDEOS }}","\n".join(rel(x) for x in ordered if x["slug"]!=v["slug"]) or '<p>Belum ada video lainnya.</p>')
+        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v["driveId"])).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
+        related=[x for x in ordered if x["slug"]!=v["slug"]]
+        chunks=[]
+        for start in range(0,len(related),4):
+            chunks.append('\n'.join(rel(x) for x in related[start:start+4]))
+            chunks.append(f'<div class="related-native-ad ad-slot" aria-label="Iklan Native">{native_ad(start//4+1)}</div>')
+        related_html='\n'.join(chunks) or '<p>Belum ada video lainnya.</p>'
+        out=out.replace("{{ RELATED_VIDEOS }}",related_html)
+        out=out.replace("{{ AD_POPUNDER }}",ad("popunder")).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile"))
         open(os.path.join(OUT,v["slug"]+".html"),"w",encoding="utf-8").write(out)
     print("Generated",len(vs),"videos")
 if __name__=="__main__":main()
