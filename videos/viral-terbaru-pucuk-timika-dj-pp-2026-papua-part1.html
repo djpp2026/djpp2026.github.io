@@ -34,23 +34,26 @@
     'params' : {}
   };
 </script>
-<script src="https://www.highrevenueformat.com/44ec389ae52afaa02c0febc53f08aa81/invoke.js"></script></div></div><script>(function(){
-  // Popunder: load once after a real user interaction. This keeps the ad code
-  // independent from the page layout and avoids browser popup blocking on page load.
+<script src="https://www.highrevenueformat.com/44ec389ae52afaa02c0febc53f08aa81/invoke.js"></script></div></div><template id="popunderTemplate"><script src="https://pl31431760.profitableratecpmnetwork.com/bd/f2/69/bdf269b9f5a3886e51278b48ec548e08.js"></script></template><script>(function(){
+  // Keep the Adsterra Popunder code outside this script so provider markup can never
+  // break the page parser. Load it once after
+  // a real user interaction (tap/click/key) while keeping the layout unchanged.
   let popLoaded=false;
   function loadPopunder(){
     if(popLoaded) return;
     popLoaded=true;
+    const tpl=document.getElementById('popunderTemplate');
+    if(!tpl) return;
     const holder=document.createElement('div');
     holder.style.display='none';
-    holder.innerHTML=`<script src="https://pl31431760.profitableratecpmnetwork.com/bd/f2/69/bdf269b9f5a3886e51278b48ec548e08.js"></script>`;
-    document.body.appendChild(holder);
+    holder.innerHTML=tpl.innerHTML;
     holder.querySelectorAll('script').forEach(oldScript=>{
       const script=document.createElement('script');
       for(const a of oldScript.attributes) script.setAttribute(a.name,a.value);
       script.text=oldScript.textContent||'';
       document.body.appendChild(script);
     });
+    tpl.remove();
   }
   document.addEventListener('pointerdown',loadPopunder,{once:true,capture:true});
   document.addEventListener('keydown',loadPopunder,{once:true,capture:true});
