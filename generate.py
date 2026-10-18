@@ -32,10 +32,16 @@ def ad(name):
     if not AD_ENABLED:return ""
     return str(ADS.get(name,"") or "").strip()
 
-def native_ad():
-    # Keep the provider-supplied script and container ID unchanged.
-    # Adsterra Native code is emitted once per generated page.
-    return ad("native")
+def native_ad(slot_id):
+    raw=ad("native")
+    if not raw:return ""
+    # Give each in-page placement its own container ID so slots do not collide.
+    # The provider script URL and all other supplied code remain unchanged.
+    ids=re.findall(r'container-([A-Za-z0-9_-]+)', raw)
+    if ids:
+        base=ids[0]
+        raw=raw.replace("container-"+base, f"container-{base}-{slot_id}")
+    return raw
 def load():
     with open(DATA,encoding="utf-8") as f:v=json.load(f)
     if not isinstance(v,list): raise ValueError("videos.json harus array")
@@ -90,10 +96,14 @@ def main():
         player_mode="embed" if (embed or str(v.get("driveId") or "").strip()) else "telegram"
         out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v.get("driveId", ""))).replace("{{ PLAYER_SRC }}",esc(player_src)).replace("{{ PLAYER_MODE }}",esc(player_mode)).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
         related=[x for x in ordered if x["slug"]!=v["slug"]]
-        related_html='\n'.join(rel(x) for x in related) or '<p>Belum ada video lainnya.</p>'
-        native_raw=native_ad()
-        native_slot=(f'<div class="related-native-ad ad-slot" aria-label="Iklan Native">{native_raw}</div>' if native_raw else "")
-        out=out.replace("{{ RELATED_VIDEOS }}",related_html).replace("{{ RELATED_NATIVE_AD }}",native_slot)
+        chunks=[]
+        for start in range(0,len(related),4):
+            chunks.append('\n'.join(rel(x) for x in related[start:start+4]))
+            native_raw=native_ad(start//4+1)
+            if native_raw:
+                chunks.append(f'<div class="related-native-ad ad-slot" aria-label="Iklan Native">{native_raw}</div>')
+        related_html='\n'.join(chunks) or '<p>Belum ada video lainnya.</p>'
+        out=out.replace("{{ RELATED_VIDEOS }}",related_html).replace("{{ RELATED_NATIVE_AD }}","")
         out=out.replace("{{ AD_POPUNDER }}",ad("popunder")).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile"))
         open(os.path.join(OUT,v["slug"]+".html"),"w",encoding="utf-8").write(out)
     print("Generated",len(vs),"videos")
