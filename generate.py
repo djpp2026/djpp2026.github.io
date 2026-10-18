@@ -47,8 +47,14 @@ def load():
     with open(DATA,encoding="utf-8") as f:v=json.load(f)
     if not isinstance(v,list): raise ValueError("videos.json harus array")
     for i,x in enumerate(v):
-        for k in ("slug","judul","driveId","tanggal","deskripsi","kategori"):
+        for k in ("slug","judul","tanggal","deskripsi","kategori"):
             if not x.get(k): raise ValueError(f"Video {i}: field {k} kosong")
+        if not str(x.get("driveId") or "").strip() and not str(x.get("embedUrl") or "").strip(): raise ValueError(f"Video {i}: driveId atau embedUrl wajib diisi")
+        embed=str(x.get("embedUrl") or "").strip()
+        if embed:
+            from urllib.parse import urlparse
+            u=urlparse(embed)
+            if u.scheme != "https" or not u.hostname or u.username or u.password: raise ValueError(f"Video {i}: embedUrl harus berupa URL HTTPS valid")
         if x["kategori"] not in CATS: raise ValueError("Kategori tidak valid: "+str(x["kategori"]))
         x.setdefault("jam","00:00")
     return v
@@ -86,7 +92,10 @@ def main():
         if f.endswith(".html"):os.remove(os.path.join(OUT,f))
     vt=open(os.path.join(TEMPLATES,"video.html"),encoding="utf-8").read()
     for v in vs:
-        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v["driveId"])).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
+        embed=str(v.get("embedUrl") or "").strip()
+        player_src=embed if embed else ("https://drive.google.com/file/d/"+str(v.get("driveId","" )).strip()+"/preview" if str(v.get("driveId") or "").strip() else "about:blank")
+        player_mode="embed" if (embed or str(v.get("driveId") or "").strip()) else "telegram"
+        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v.get("driveId", ""))).replace("{{ PLAYER_SRC }}",esc(player_src)).replace("{{ PLAYER_MODE }}",esc(player_mode)).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
         related=[x for x in ordered if x["slug"]!=v["slug"]]
         chunks=[]
         for start in range(0,len(related),4):
