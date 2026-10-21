@@ -3,3 +3,17 @@
 .player-top-ad,.player-bottom-ad{margin:1rem auto;min-height:50px}.player-top-ad{margin-top:0}.player-bottom-ad{margin-bottom:1.1rem}.related-native-ad{grid-column:1/-1;min-height:250px;margin:.2rem 0 .4rem;display:flex;justify-content:center;align-items:center;overflow:hidden}.related-native-ad:empty{display:none}
 @media(max-width:767px){.player-top-ad,.player-bottom-ad{min-height:50px}.player-top-ad .ad-banner-mobile,.player-bottom-ad .ad-banner-mobile{display:block}.player-top-ad .ad-banner-desktop,.player-bottom-ad .ad-banner-desktop{display:none}.related-native-ad{min-height:250px}.video-detail{max-width:980px}}
 @media(min-width:768px){.player-top-ad,.player-bottom-ad{min-height:90px}.player-top-ad .ad-banner-mobile,.player-bottom-ad .ad-banner-mobile{display:none}.player-top-ad .ad-banner-desktop,.player-bottom-ad .ad-banner-desktop{display:block}}
+
+/* Riwayat video di bawah pemutar: 2 kolom x 2 baris per halaman, native ad, lalu nomor halaman. */
+.related-videos{margin-top:1rem}
+.related-header h2{font-size:1.15rem}
+.related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.related-native-ad{margin:1rem 0 .5rem;min-height:250px}
+.related-pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:.4rem;margin:1rem 0 .5rem}
+.page-btn{min-width:38px;height:38px;padding:0 .7rem;border:1px solid #cbd5e1;border-radius:8px;background:var(--card);color:var(--text);font-weight:600;font-size:.95rem;cursor:pointer}
+.page-btn:hover:not(:disabled){border-color:var(--primary);color:var(--primary)}
+.page-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.page-btn:disabled{opacity:.4;cursor:default}
+.page-dots{color:#64748b;padding:0 .2rem}
+.video-detail>.description{margin-top:1.4rem}
+@media(max-width:767px){.related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.page-btn{min-width:34px;height:34px;padding:0 .5rem;font-size:.9rem}}
