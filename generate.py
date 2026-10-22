@@ -94,7 +94,12 @@ def main():
         embed=str(v.get("embedUrl") or "").strip()
         player_src=embed if embed else ("https://drive.google.com/file/d/"+str(v.get("driveId","" )).strip()+"/preview" if str(v.get("driveId") or "").strip() else "about:blank")
         player_mode="embed" if (embed or str(v.get("driveId") or "").strip()) else "telegram"
-        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v.get("driveId", ""))).replace("{{ PLAYER_SRC }}",esc(player_src)).replace("{{ PLAYER_MODE }}",esc(player_mode)).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
+        smart=""
+        if AD_ENABLED and v.get("smartlink") is True:
+            from urllib.parse import urlparse
+            su=str(ADS.get("smartlink") or "").strip(); pu=urlparse(su)
+            if pu.scheme=="https" and pu.hostname and not pu.username and not pu.password: smart=su
+        out=vt.replace("{{ JUDUL }}",esc(v["judul"])).replace("{{ DESKRIPSI }}",esc(v["deskripsi"])).replace("{{ DRIVE_ID }}",esc(v.get("driveId", ""))).replace("{{ PLAYER_SRC }}",esc(player_src)).replace("{{ PLAYER_MODE }}",esc(player_mode)).replace("{{ SMARTLINK }}",esc(smart)).replace("{{ KATEGORI }}",esc(v["kategori"])).replace("{{ TANGGAL }}",esc(dtext(v))).replace("{{ COVER }}",esc(cover(v,True))).replace("{{ OG_COVER }}",esc(og(v))).replace("{{ PAGE_URL }}",esc(f'{SITE_URL}/videos/{v["slug"]}.html' if SITE_URL else f'videos/{v["slug"]}.html'))
         related=[x for x in ordered if x["slug"]!=v["slug"]]
         related_html='\n'.join(rel(x) for x in related) or '<p>Belum ada video lainnya.</p>'
         native_raw=ad("native")  # kode Adsterra dipakai apa adanya (container ID tidak diubah)
