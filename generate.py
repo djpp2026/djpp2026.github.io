@@ -85,7 +85,7 @@ def rel(v):
 def main():
     vs=load(); ordered=sorted(vs,key=dt,reverse=True)
     it=open(os.path.join(TEMPLATES,"index.html"),encoding="utf-8").read()
-    open(os.path.join(BASE,"index.html"),"w",encoding="utf-8").write(it.replace("{{ VIDEO_CARDS }}","\n".join(card(v) for v in ordered)).replace("{{ AD_POPUNDER }}",ad("popunder")).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile")).replace("{{ AD_NATIVE }}",ad("native")))
+    open(os.path.join(BASE,"index.html"),"w",encoding="utf-8").write(it.replace("{{ VIDEO_CARDS }}","\n".join(card(v) for v in ordered)).replace("{{ AD_POPUNDER }}","").replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile")).replace("{{ AD_NATIVE }}",ad("native")))
     os.makedirs(OUT,exist_ok=True)
     for f in os.listdir(OUT):
         if f.endswith(".html"):os.remove(os.path.join(OUT,f))
@@ -105,7 +105,8 @@ def main():
         native_raw=ad("native")  # kode Adsterra dipakai apa adanya (container ID tidak diubah)
         native_html=f'<div class="related-native-ad ad-slot" aria-label="Iklan Native">{native_raw}</div>' if native_raw else ''
         out=out.replace("{{ RELATED_VIDEOS }}",related_html).replace("{{ RELATED_NATIVE_AD }}",native_html)
-        out=out.replace("{{ AD_POPUNDER }}",ad("popunder")).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile"))
+        popu=ad("popunder") if v.get("popunder") is True else ""  # Pop Under hanya untuk video yang dipilih di admin
+        out=out.replace("{{ AD_POPUNDER }}",popu).replace("{{ AD_SOCIAL_BAR }}",ad("social_bar")).replace("{{ AD_BANNER_DESKTOP }}",ad("banner_desktop")).replace("{{ AD_BANNER_MOBILE }}",ad("banner_mobile"))
         open(os.path.join(OUT,v["slug"]+".html"),"w",encoding="utf-8").write(out)
     print("Generated",len(vs),"videos")
 if __name__=="__main__":main()
